@@ -52,7 +52,7 @@ var x = d3.scaleBand()
 var y0 = d3.scaleLinear()
   .rangeRound([height, 0]);
 
-var y1 = d3.scaleBand()
+var y1 = d3.scalePoint()
   .range([height, 0]);
 
 
@@ -68,7 +68,7 @@ function drawGraph(data) {
     }));
 
   y0.domain([0, d3.max(graphData, function (d) {
-      return Number(d.od_world);
+      return Number(d.od_world) + 17;
     })]); 
 
   y1.domain(ylabelData.map(function (d) {
@@ -91,6 +91,8 @@ function drawGraph(data) {
   // add the y axis
   g.append("g")
       .call(d3.axisLeft(y1))
+    .selectAll("text")
+
 
 
 
