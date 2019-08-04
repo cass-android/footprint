@@ -23,6 +23,21 @@
       opacity: 1;
     }
 
+    .line:{
+      fill: brown;
+      opacity: 1;
+    }
+
+    .grid line {
+      stroke: lightgrey;
+      stroke-opacity: 0.7;
+      shape-rendering: crispEdges;
+    }
+
+    .grid path {
+      stroke-width: 0;
+    }
+
 
   </style>
 </head>
@@ -56,10 +71,11 @@ var y1 = d3.scalePoint()
   .range([height, 0]);
 
 
-
 var graphData = {{ data.chart_data | safe }}
 
 var ylabelData = {{ data.ylabel_data | safe }}
+
+
 
 function drawGraph(data) {
   //scale the range of the data
@@ -94,8 +110,6 @@ function drawGraph(data) {
     .selectAll("text")
 
 
-
-
   // add the chart title
   g.append("text")
       .attr("x", (width / 2))
@@ -114,6 +128,18 @@ function drawGraph(data) {
       .attr("font-family", "Arial, Helvetica, sans-serif")
       .style("text-anchor", "middle")
       .text("Overshoot Date")
+
+
+  // add the horizontal line
+  svg.append("g")
+       .attr("transform", "translate("+ margin.left + "," + margin.bottom+ ")")
+       .append("line")
+       .attr("x1", 0)
+       .attr("x2", width)
+       .attr("y1", y0(365-17-8))
+       .attr("y2", y0(365-17-8))
+       .style("stroke", "#2ecc71")
+       .style("stroke-width", "1px")
 
   // add the bars - World
   g.selectAll(".bar1")
