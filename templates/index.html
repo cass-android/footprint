@@ -3,13 +3,27 @@
   <meta charset="utf-8">
   <svg width="960" height="500"></svg>
   <style>
-    .bar {
+    .bar1 {
       fill: steelblue;
+      opacity: 0.5;
     }
 
-    .bar:hover {
+    .bar1:hover {
       fill: brown;
+      opacity: 0.5;
     }
+
+    .bar2 {
+      fill: #006633;
+      opacity: 0.5;
+    }
+
+    .bar2:hover {
+      fill: brown;
+      opacity: 0.5;
+    }
+
+
   </style>
 </head>
 <body>
@@ -29,8 +43,9 @@ height = +svg.attr("height") - margin.top - margin.bottom,
 g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 var x = d3.scaleBand()
-  .rangeRound([0, width])
-  .padding(0.1);
+  .range([0, width])  // changed from rangeRound to remove whitespace
+  .paddingInner(0.1);
+  
 
 var y = d3.scaleLinear()
   .rangeRound([height, 0]);
@@ -63,10 +78,10 @@ function drawGraph(data) {
   .text("Overshoot Date");
 
   // add the bars
-  g.selectAll(".bar")
+  g.selectAll(".bar1")
   .data(data)
   .enter().append("rect")
-  .attr("class", "bar")
+  .attr("class", "bar1")
   .attr("x", function (d) {
     return x(d.year);
   })
@@ -77,6 +92,22 @@ function drawGraph(data) {
   .attr("height", function (d) {
     return height - y(Number(d.od_world));
   });
+
+  g.selectAll(".bar2")
+  .data(data)
+  .enter().append("rect")
+  .attr("class", "bar1")
+  .attr("x", function (d) {
+    return x(d.year);
+  })
+  .attr("y", function (d) {
+    return y(Number(d.od_can_pc));
+  })
+  .attr("width", x.bandwidth())
+  .attr("height", function (d) {
+    return height - y(Number(d.od_can_pc));
+  });
+
 };
 
 drawGraph(graphData);
