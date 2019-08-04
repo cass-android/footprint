@@ -43,6 +43,8 @@ height = +svg.attr("height") - margin.top - margin.bottom,
 g = svg.append("g").attr("transform", 
   "translate(" + margin.left + "," + margin.top + ")");
 
+
+
 var x = d3.scaleBand()
   .range([0, width])  // changed from rangeRound to remove whitespace
   .paddingInner(0.1);
@@ -50,8 +52,10 @@ var x = d3.scaleBand()
 var y0 = d3.scaleLinear()
   .rangeRound([height, 0]);
 
-var y1 = d3.scaleLinear()
-  .rangeRound([height, 0]);
+var y1 = d3.scaleBand()
+  .range([height, 0]);
+
+
 
 var graphData = {{ data.chart_data | safe }}
 
@@ -67,12 +71,14 @@ function drawGraph(data) {
       return Number(d.od_world);
     })]); 
 
-  y1.domain([0, d3.max(ylabelData, function (d) {
-      return Number(d.value);
-    })]); 
+  y1.domain(ylabelData.map(function (d) {
+    return d.month;
+  }));
+
 
   // add the x axis
   g.append("g")
+      .attr("class", "axis")
       .attr("transform", "translate(0," + height + ")")
       .call(d3.axisBottom(x))
     .selectAll("text")
@@ -84,7 +90,8 @@ function drawGraph(data) {
 
   // add the y axis
   g.append("g")
-      .call(d3.axisLeft(y1));
+      .call(d3.axisLeft(y1))
+
 
 
   // add the chart title

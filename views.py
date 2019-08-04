@@ -13,9 +13,9 @@ import json
 def index():
 
     months = ['Jan','Feb','Mar','Apr','May','Jun',
-     'Jul','Aug','Sep','Oct','Nov','Dec']
+     'Jul','Aug','Sep','Oct','Nov','Dec', 'Jan', 'Feb']
 
-    values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
 
     df = pd.read_csv("static/footprintnetwork.csv")
     df2 = pd.DataFrame({'month':months, 'value':values})
