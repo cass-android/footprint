@@ -5,22 +5,22 @@
   <style>
     .bar1 {
       fill: steelblue;
-      opacity: 0.5;
+      opacity: 0.9;
     }
 
     .bar1:hover {
       fill: brown;
-      opacity: 0.5;
+      opacity: 1;
     }
 
     .bar2 {
       fill: #006633;
-      opacity: 0.5;
+      opacity: 0.7;
     }
 
     .bar2:hover {
       fill: brown;
-      opacity: 0.5;
+      opacity: 1;
     }
 
 
@@ -40,6 +40,7 @@ margin = {
 },
 width = +svg.attr("width") - margin.left - margin.right,
 height = +svg.attr("height") - margin.top - margin.bottom,
+
 g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 var x = d3.scaleBand()
@@ -63,50 +64,56 @@ function drawGraph(data) {
 
   // add the x axis
   g.append("g")
-  .attr("transform", "translate(0," + height + ")")
-  .call(d3.axisBottom(x))
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x))
+    .selectAll("text")
+      .attr("y", 0)
+      .attr("x", 8)
+      .attr("dy", ".35em")
+      .attr("transform", "rotate(90)")
+      .style("text-anchor", "start");
 
   // add the y axis
   g.append("g")
-  .call(d3.axisLeft(y))
-  .append("text")
-  .attr("fill", "#000")
-  .attr("transform", "rotate(-90)")
-  .attr("y", 6)
-  .attr("dy", "0.71em")
-  .attr("text-anchor", "end")
-  .text("Overshoot Date");
+      .call(d3.axisLeft(y))
+      .append("text")
+      .attr("fill", "#000")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", "0.71em")
+      .attr("text-anchor", "end")
+      .text("Overshoot Date");
 
   // add the bars
   g.selectAll(".bar1")
-  .data(data)
-  .enter().append("rect")
-  .attr("class", "bar1")
-  .attr("x", function (d) {
-    return x(d.year);
-  })
-  .attr("y", function (d) {
-    return y(Number(d.od_world));
-  })
-  .attr("width", x.bandwidth())
-  .attr("height", function (d) {
-    return height - y(Number(d.od_world));
-  });
+      .data(data)
+      .enter().append("rect")
+      .attr("class", "bar1")
+      .attr("x", function (d) {
+        return x(d.year);
+      })
+      .attr("y", function (d) {
+        return y(Number(d.od_world));
+      })
+      .attr("width", x.bandwidth())
+      .attr("height", function (d) {
+        return height - y(Number(d.od_world));
+      });
 
   g.selectAll(".bar2")
-  .data(data)
-  .enter().append("rect")
-  .attr("class", "bar1")
-  .attr("x", function (d) {
-    return x(d.year);
-  })
-  .attr("y", function (d) {
-    return y(Number(d.od_can_pc));
-  })
-  .attr("width", x.bandwidth())
-  .attr("height", function (d) {
-    return height - y(Number(d.od_can_pc));
-  });
+      .data(data)
+      .enter().append("rect")
+      .attr("class", "bar2")
+      .attr("x", function (d) {
+        return x(d.year);
+      })
+      .attr("y", function (d) {
+        return y(Number(d.od_can_pc));
+      })
+      .attr("width", x.bandwidth())
+      .attr("height", function (d) {
+        return height - y(Number(d.od_can_pc));
+      });
 
 };
 
