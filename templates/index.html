@@ -123,7 +123,8 @@ var tooldiv = d3.select("body").append("div")
 
 // define the div for the earth display 
 var earthdiv = d3.select("body").append("div")
-    .attr("class", "earths");
+    .attr("class", "earths")
+    .style("opacity", 0);;
 
 // create a date formatter (used in tooltip)
 var formatter = d3.timeFormat("%B %d");
@@ -145,16 +146,18 @@ function drawGraph(data) {
     }));
 
   // define the range
-  x1.domain(data.map(function (d) {
-    return d.earth_World;
-  }))
+  x1.domain([0, d3.max(graphData, function (d) {
+    return Number(d.earth_World);
+  })]); 
 
   y0.domain([0, d3.max(graphData, function (d) {
       return Number(d.od_world) + 17;
     })]); 
+
   y1.domain(ylabelData.map(function (d) {
     return d.month;
   }));
+
 
     // add the bars - World
   g.selectAll(".bar1")
@@ -176,7 +179,16 @@ function drawGraph(data) {
               .duration(200)    
               .style("opacity", .9); 
           earthdiv.html(d.earth_World)
-              .style("top", (width/2) + "px"); 
+              .style("left", (width/2) + "px")
+              .style("top", (height/3) + "px");
+          earthdiv.selectAll('earthdiv')
+              .data(data)
+              .enter().append("rect")
+              .attr("class", "bar1")
+              .attr("x", 50)
+              .attr("y", 0)
+              .attr("width", function (d) {return x1(Number(d.earth_World)); })
+              .attr("height", 10);
           })          
       .on("mouseout", function(d) {   
           tooldiv.transition()    
@@ -202,7 +214,6 @@ function drawGraph(data) {
           tooldiv.transition()    
               .duration(200)    
               .style("opacity", .9);   
-          //div.html(d.year + "<br/>"  + d.odate_world)
           tooldiv.html(d.year + "<br/>"  + "Canada's Overshoot: "  + "<br/>"  + d.odate_can)
               .style("left", (d3.event.pageX) + "px")   
               .style("top", (d3.event.pageY) + "px");  
