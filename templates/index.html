@@ -23,20 +23,20 @@
       opacity: 1;
     }
 
-    .line:{
-      fill: brown;
-      opacity: 1;
-    }
+    div.tooltip { 
+    position: absolute;     
+    text-align: center;     
+    width: 60px;          
+    height: 28px;         
+    padding: 2px;       
+    font: 12px sans-serif;    
+    background: lightsteelblue; 
+    border: 0px;    
+    border-radius: 8px;     
+    pointer-events: none;     
+}
 
-    .grid line {
-      stroke: lightgrey;
-      stroke-opacity: 0.7;
-      shape-rendering: crispEdges;
-    }
 
-    .grid path {
-      stroke-width: 0;
-    }
 
 
   </style>
@@ -45,6 +45,7 @@
 <script src="https://d3js.org/d3.v5.min.js"></script>
 <script>
 
+// set the dimensions for the canvas
 var svg = d3.select("svg"),
 margin = {
   top: 50,
@@ -55,13 +56,14 @@ margin = {
 width = +svg.attr("width") - margin.left - margin.right,
 height = +svg.attr("height") - margin.top - margin.bottom,
 
+// set the dimensions or the graph
 g = svg.append("g").attr("transform", 
   "translate(" + margin.left + "," + margin.top + ")");
 
 
-
+// these variables scale data relative to the svg canvas 
 var x = d3.scaleBand()
-  .range([0, width])  // changed from rangeRound to remove whitespace
+  .range([0, width])  
   .paddingInner(0.1);
 
 var y0 = d3.scaleLinear()
@@ -70,27 +72,39 @@ var y0 = d3.scaleLinear()
 var y1 = d3.scalePoint()
   .range([height, 0]);
 
-
+// import data from views.py (in JSON)
 var graphData = {{ data.chart_data | safe }}
-
 var ylabelData = {{ data.ylabel_data | safe }}
 
+// define the div for the tooltip
+var div = d3.select("body").append("div") 
+    .attr("class", "tooltip")       
+    .style("opacity", 0);
+
+// create a date formatter (used in tooltip. Dates are parsed in views.py)
+var formatter = d3.timeFormat("%B %d");
+
+let now = new Date();
+
+graphData.forEach(function(d) {
+    d.odate_world = formatter(new Date(d.odate_world))
+    console.log(d.odate_world);
+});
 
 
+// draw the graph
 function drawGraph(data) {
-  //scale the range of the data
+
+  // define the ranges for the axes
   x.domain(graphData.map(function (d) {
       return d.year;
     }));
-
   y0.domain([0, d3.max(graphData, function (d) {
       return Number(d.od_world) + 17;
     })]); 
-
   y1.domain(ylabelData.map(function (d) {
     return d.month;
   }));
-
 
   // add the x axis
   g.append("g")
@@ -108,7 +122,6 @@ function drawGraph(data) {
   g.append("g")
       .call(d3.axisLeft(y1))
     .selectAll("text")
-
 
   // add the chart title
   g.append("text")
@@ -129,32 +142,42 @@ function drawGraph(data) {
       .style("text-anchor", "middle")
       .text("Overshoot Date")
 
-
   // add the horizontal line
-  svg.append("g")
-       .attr("transform", "translate("+ margin.left + "," + margin.bottom+ ")")
-       .append("line")
-       .attr("x1", 0)
-       .attr("x2", width)
-       .attr("y1", y0(365-17-8))
-       .attr("y2", y0(365-17-8))
-       .style("stroke", "#2ecc71")
-       .style("stroke-width", "1px")
+  g.append("g")
+      .append("line")
+      .attr("x1", 0)
+      .attr("x2", width)
+      .attr("y1", y0(365))
+      .attr("y2", y0(365))
+      .style("stroke", "#2ecc71")
+      .style("stroke-width", "1px")
+
+  
+
+
 
   // add the bars - World
   g.selectAll(".bar1")
       .data(data)
       .enter().append("rect")
       .attr("class", "bar1")
-      .attr("x", function (d) {
-        return x(d.year);
-      })
-      .attr("y", function (d) {
-        return y0(Number(d.od_world));
-      })
+      .attr("x", function (d) {return x(d.year); })
+      .attr("y", function (d) { return y0(Number(d.od_world)); })
       .attr("width", x.bandwidth())
-      .attr("height", function (d) {
-        return height - y0(Number(d.od_world));
+      .attr("height", function (d) {return height - y0(Number(d.od_world)); })
+      .on("mouseover", function(d) {    
+          div.transition()    
+              .duration(200)    
+              .style("opacity", .9);   
+          //div.html(d.year + "<br/>"  + d.odate_world)
+          div.html(d.year + "<br/>"  + d.odate_world)
+              .style("left", (d3.event.pageX) + "px")   
+              .style("top", (d3.event.pageY) + "px");  
+          })          
+      .on("mouseout", function(d) {   
+          div.transition()    
+              .duration(500)    
+              .style("opacity", 0); 
       });
 
   // add the bars - Canada

@@ -18,6 +18,7 @@ def index():
     values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,15,16,17,18]
 
     df = pd.read_csv("static/footprintnetwork.csv")
+
     df2 = pd.DataFrame({'month':months, 'value':values})
 
     chart_data = json.dumps(df.to_dict(orient='records'), indent=2)
