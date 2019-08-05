@@ -174,24 +174,25 @@ function drawGraph(data) {
               .style("opacity", .9);   
           tooldiv.html(d.year + "<br/>"  + "World Overshoot: "  + "<br/>" + d.odate_world)
               .style("left", (d3.event.pageX) + "px")   
-              .style("top", (d3.event.pageY) + "px");  
+              .style("top", (d3.event.pageY) + "px")  
 
           g.selectAll('earthdiv')
               .data(data, function (d) {return x1(Number(d.earth_World)); })
               .enter().append("rect")
               .attr("class", "bar1")
-              .attr("x", 0)
+              .attr("id", "myBar")
+              .attr("x", (width/3))
               .attr("y", 0)
               .attr("width", x1(d.earth_World))
-              .attr("height", 10);
+              .attr("height", 75);
           })          
       .on("mouseout", function(d) {   
           tooldiv.transition()    
               .duration(500)    
-              .style("opacity", 0); 
-          earthdiv.transition()    
-              .duration(500)    
-              .style("opacity", 0); 
+              .style("opacity", 0) 
+
+          g.selectAll("#myBar").remove();
+           
       });
 
   // add the bars - Canada
