@@ -3,30 +3,51 @@
   <meta charset="utf-8">
   <style>
     .bar1 {
-      fill: steelblue;
+      fill: #E5E6DA;
       opacity: 0.9;
     }
 
     .bar1:hover {
-      fill: brown;
+      fill: #F3B63D;
       opacity: 1;
     }
 
     .bar2 {
-      fill: #006633;
+      fill: #4E7C4E;
       opacity: 0.7;
     }
 
     .bar2:hover {
-      fill: brown;
+      fill: #3F643B;
       opacity: 1;
     }
 
+    .line {
+      fill: none;
+      stroke: #96ADCB;
+      stroke-width: 1px;
+      stroke-dasharray: 5,5; 
+    }
+
+    .axisWhite line{
+      stroke: #96ADCB;
+      stroke-width: 1px;
+
+    }
+
+    .axisWhite path{
+      stroke: #96ADCB;
+    }
+
+    .axisWhite text{
+      fill: #96ADCB;
+      font-size: 13px;
+    }
     div.tooltip { 
     position: absolute;     
     text-align: center;     
-    width: 60px;          
-    height: 28px;         
+    width: 120px;          
+    height: 44px;         
     padding: 2px;       
     font: 12px sans-serif;    
     background: lightsteelblue; 
@@ -34,15 +55,16 @@
     border-radius: 8px;     
     pointer-events: none;     
 }
-
-
-
+    body {
+    background: #51637A; 
+    }
 
   </style>
 </head>
 <body>
 <script src="https://d3js.org/d3.v5.min.js"></script>
-<div>
+<script src="https://d3js.org/d3-selection-multi.v0.4.min.js"></script>
+<div class="chart">
   <svg width="1300" height="600"></svg>
 </div>
 
@@ -83,18 +105,15 @@ var div = d3.select("body").append("div")
     .attr("class", "tooltip")       
     .style("opacity", 0);
 
-// create a date formatter (used in tooltip. Dates are parsed in views.py)
+// create a date formatter (used in tooltip)
 var formatter = d3.timeFormat("%B %d");
-
-let now = new Date();
-
 graphData.forEach(function(d) {
     d.odate_world = formatter(new Date(d.odate_world))
 });
-
 graphData.forEach(function(d) {
     d.odate_can = formatter(new Date(d.odate_can))
 });
+
 
 
 // draw the graph
@@ -111,61 +130,7 @@ function drawGraph(data) {
     return d.month;
   }));
 
-  // add the x axis
-  g.append("g")
-      .attr("class", "axis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x))
-    .selectAll("text")
-      .attr("y", 0)
-      .attr("x", 8)
-      .attr("dy", ".35em")
-      .attr("transform", "rotate(90)")
-      .style("text-anchor", "start")
-      .style("font-size", "15px");
-
-  // add the y axis
-  g.append("g")
-      .call(d3.axisLeft(y1))
-    .selectAll("text")
-      .style("font-size", "15px")
-
-  // add the chart title
-  g.append("text")
-      .attr("x", (width / 2))
-      .attr("y", 2 - (margin.top / 2))
-      .attr("text-anchor", "middle")
-      .attr("font-family", "Arial, Helvetica, sans-serif")
-      .style("font-size", "30px")
-      .text("Overshoot Days Since 1961")
-
-  // add the y axis title
-  g.append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 20  - margin.left)
-      .attr("x", 0 - (height / 2))
-      .attr("dy", "0.8em")
-      .attr("font-family", "Arial, Helvetica, sans-serif")
-      .style("text-anchor", "middle")
-      .style("font-size", "20px")
-      .text("Month of Overshoot")
-
-
-  // add the horizontal line
-  g.append("g")
-      .append("line")
-      .attr("x1", 0)
-      .attr("x2", width)
-      .attr("y1", y0(365))
-      .attr("y2", y0(365))
-      .style("stroke", "#2ecc71")
-      .style("stroke-width", "1px")
-
-  
-
-
-
-  // add the bars - World
+    // add the bars - World
   g.selectAll(".bar1")
       .data(data)
       .enter().append("rect")
@@ -213,9 +178,69 @@ function drawGraph(data) {
           div.transition()    
               .duration(500)    
               .style("opacity", 0); 
-      });      
+      });   
 
-};
+  // add the x axis
+  g.append("g")
+      .attr("class", "axisWhite")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x))
+
+    .selectAll("text")
+      .attr("y", 0)
+      .attr("x", 8)
+      .attr("dy", ".35em")
+      .attr("transform", "rotate(90)")
+      .style("text-anchor", "start")
+
+    var ticks = d3.selectAll(".tick text");
+      ticks.attr("class", function(d,i){
+          if(i%3 != 0) d3.select(this).remove();
+      });
+
+  // add the y axis
+  g.append("g")
+      .attr("class", "axisWhite")
+      .call(d3.axisLeft(y1))
+
+  // add the chart title
+  g.append("text")
+      .attr("x", (width / 2))
+      .attr("y", 2 - (margin.top / 2))
+      .attr("text-anchor", "middle")
+      .attr("font-family", "Arial, Helvetica, sans-serif")
+      .style("font-size", "30px")
+      .style("fill", '#E5E6DA')
+      .text("Overshoot Days: Canada and the World")
+
+  // add the y axis title
+  g.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 20  - margin.left)
+      .attr("x", 0 - (height / 2))
+      .attr("dy", "0.8em")
+      .attr("font-family", "Arial, Helvetica, sans-serif")
+      .style("text-anchor", "middle")
+      .style("font-size", "20px")
+      .style("fill", '#E5E6DA')
+      .text("Month When We Reach Earth's Limits")
+
+  // add the fill area
+  //g.append("path")
+  //    .attr("class", "area")
+  //    .call(area.y([height]))
+
+
+  // add the horizontal line
+  g.append("g")
+      .attr("class", "line")
+      .append("line")
+      .attr("x1", 0)
+      .attr("x2", width)
+      .attr("y1", y0(365))
+      .attr("y2", y0(365))
+
+      };
 
 drawGraph(graphData);
 
