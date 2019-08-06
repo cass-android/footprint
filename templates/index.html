@@ -139,7 +139,7 @@ graphData.forEach(function(d) {
 
 // draw the graph
 function drawGraph(data) {
-
+  console.log(data)
   // define the ranges for the axes
   x.domain(graphData.map(function (d) {
       return d.year;
@@ -158,6 +158,12 @@ function drawGraph(data) {
     return d.month;
   }));
 
+  var earthwidth = d3.max(graphData, function (d) {
+    return Number(d.earth_World);
+  })
+
+  console.log(earthwidth)
+
  g.append("defs")
       .append("pattern")
       .attr('id', 'earthfill')
@@ -169,23 +175,14 @@ function drawGraph(data) {
       .attr('width', 100)
       .attr('height', 100);
 
-
-  g.selectAll("earths")
-      .data(data)
-      .enter().append("rect")
+  g.append("rect")
       .attr('id', 'earths')       
       .attr("x", (width/3))        // position the left of the rectangle
       .attr("y", 0)         // position the top of the rectangle
       //.attr("clip-path", "url(#ellipse-clip)") // clip the rectangle
       .style("fill", "url(#earthfill)")   // fill the clipped path with grey
       .attr("height", 100)    // set the height
-      .attr("width", function (d) {return x1(d.earth_World); })    // set the width
-
-  var earthwidth = d3.max(graphData, function (d) {
-      return Number(d.earth_World);
-    })
-
-  g
+      .attr("width", x1(earthwidth))    // set the width
 
   // add the bars - World
   g.selectAll(".bar1")
@@ -236,7 +233,7 @@ function drawGraph(data) {
       });
 
   // add the bars - Canada
-  g.selectAll(".bar2")
+  g.selectAll(".bar3")
       .data(data)
       .enter().append("rect")
       .attr("class", "bar2")
