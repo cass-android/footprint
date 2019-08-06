@@ -29,10 +29,6 @@
       stroke-dasharray: 5,5; 
     }
 
-    .text {
-      fill: #E5E6DA;
-    }
-
     .axisWhite line{
       stroke: #96ADCB;
       stroke-width: 1px;
@@ -50,7 +46,7 @@
     div.tooltip { 
       position: absolute;     
       text-align: center;     
-      width: 120px;          
+      width: 130px;          
       height: 44px;         
       padding: 2px;       
       font: 12px sans-serif;    
@@ -201,7 +197,7 @@ function drawGraph(data) {
           tooldiv.transition()    
               .duration(50)    
               .style("opacity", .9);   
-          tooldiv.html(d.year + "<br/>"  + "World Overshoot: "  + "<br/>" + d.odate_world)
+          tooldiv.html(d.year + "<br/>"  + "World Overshoot Day: "  + "<br/>" + d.odate_world)
               .style("left", (d3.event.pageX) + "px")   
               .style("top", (d3.event.pageY) + "px")
           earthdiv.transition()    
@@ -249,7 +245,7 @@ function drawGraph(data) {
           tooldiv.transition()    
               .duration(50)    
               .style("opacity", .9);   
-          tooldiv.html(d.year + "<br/>"  + "Canada's Overshoot: "  + "<br/>"  + d.odate_can)
+          tooldiv.html(d.year + "<br/>"  + "Canada Overshoot Day: "  + "<br/>"  + d.odate_can)
               .style("left", (d3.event.pageX) + "px")   
               .style("top", (d3.event.pageY) + "px")
           earthdiv.transition()    
@@ -287,7 +283,6 @@ function drawGraph(data) {
       .attr("class", "axisWhite")
       .attr("transform", "translate(0," + height + ")")
       .call(d3.axisBottom(x))
-
     .selectAll("text")
       .attr("y", 0)
       .attr("x", 8)
@@ -307,7 +302,7 @@ function drawGraph(data) {
 
   // add the chart title
   g.append("text")
-      .attr("class", "text")
+      .attr("fill", "#E5E6DA")
       .attr("x", (width / 2))
       .attr("y", 2 - (margin.top / 2))
       .attr("text-anchor", "middle")
@@ -328,9 +323,14 @@ function drawGraph(data) {
       .text("Month When We Reach Earth's Limits")
 
   // add the fill area
-  //g.append("path")
-  //    .attr("class", "area")
-  //    .call(area.y([height]))
+  g.append("g")
+      .append("rect")
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr('width', 200)
+      .attr('height', y0(365))
+      .style("fill", '#51637A' )
+      .style("opacity", .7 )
 
   // add the horizontal line
   g.append("g")
@@ -340,6 +340,14 @@ function drawGraph(data) {
       .attr("x2", width)
       .attr("y1", y0(365))
       .attr("y2", y0(365))
+
+  g.append("text")
+      .attr("x", 10)
+      .attr("y", y0(375))
+      .text("No Overshoot Above This Line")
+      .attr("fill", "#E5E6DA")
+      .attr("font-family", "Arial, Helvetica, sans-serif")
+
 
       };
 
