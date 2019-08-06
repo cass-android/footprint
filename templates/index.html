@@ -158,6 +158,20 @@ function drawGraph(data) {
     return d.month;
   }));
 
+  var defs = g.append("image")
+      .attr('id', 'earthfill')
+      .attr("xlink:href", "static/img.svg");
+
+
+  g.selectAll("bar")
+      .data(data)
+      .enter().append("rect")       // attach a rectangle
+      .attr("x", (width/3))        // position the left of the rectangle
+      .attr("y", 0)         // position the top of the rectangle
+      //.attr("clip-path", "url(#ellipse-clip)") // clip the rectangle
+      .style("fill", "white")   // fill the clipped path with grey
+      .attr("height", 100)    // set the height
+      .attr("width", function (d) {return x1(d.earth_World); })    // set the width
 
     // add the bars - World
   g.selectAll(".bar1")
@@ -179,18 +193,18 @@ function drawGraph(data) {
           g.selectAll('earthdiv')
               .data(data, function (d) {return x1(Number(d.earth_World)); })
               .enter().append("rect")
-              .attr("class", "bar1")
+             // .attr("class", "bar1")
+              //.style('fill', 'url(#imagepattern)')
               .attr("id", "myBar")
               .attr("x", (width/3))
               .attr("y", 0)
               .attr("width", x1(d.earth_World))
-              .attr("height", 75);
+              .attr("height", 100);
           })          
       .on("mouseout", function(d) {   
           tooldiv.transition()    
               .duration(500)    
               .style("opacity", 0) 
-
           g.selectAll("#myBar").remove();
            
       });
@@ -269,7 +283,6 @@ function drawGraph(data) {
   //g.append("path")
   //    .attr("class", "area")
   //    .call(area.y([height]))
-
 
   // add the horizontal line
   g.append("g")
