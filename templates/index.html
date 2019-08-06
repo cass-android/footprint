@@ -220,7 +220,7 @@ function drawGraph(data) {
               .attr("y", 0)
               .attr("width", x1(earthmax - d.earth_World))
               .attr("height", x1(1))
-              .style("fill", 'black');
+              .style("fill", '#51637A');
           })          
       .on("mouseout", function(d) {   
           tooldiv.transition()    
@@ -249,41 +249,40 @@ function drawGraph(data) {
       .attr("height", function (d) {return height - y0(Number(d.od_can_pc)); })
       .on("mouseover", function(d) {    
           tooldiv.transition()    
-              .duration(200)    
+              .duration(50)    
               .style("opacity", .9);   
           tooldiv.html(d.year + "<br/>"  + "Canada's Overshoot: "  + "<br/>"  + d.odate_can)
               .style("left", (d3.event.pageX) + "px")   
               .style("top", (d3.event.pageY) + "px")
-          g.append("text")
-              .attr('id', 'earthtext')
-              .attr("x", width * (2/3) )
-              .attr("y", 50)
-              .attr("text-anchor", "left")
-              .attr("font-family", "Arial, Helvetica, sans-serif")
-              .style("font-size", "16px")
-              .style("fill", '#E5E6DA')
-              .text("Number of Earths Required:" + d.earth_Canada)
+          earthdiv.transition()    
+              .duration(50)    
+              .style("opacity", 1);  
+          earthdiv.html("Number of Earths Required:" + "<br/>" + round(d.earth_Canada))
           g.selectAll("#earths")
               .style("opacity", 1)
           g.selectAll('earthdiv')
               .data(data, function (d) {return x1(Number(d.earth_Canada)); })
               .enter().append("rect")
               .attr("id", "earthHider")
-              .attr("x", (width/3))
+              .attr("x", (1/2*width) + x1(d.earth_Canada))
               .attr("y", 0)
-              .attr("width", x1(earthmax -d.earth_Canada))
-              .attr("height", 100)
-              .style("fill", '#51637A'); 
-          })            
-      .on("mouseout", function(d) {   
+              .attr("width", x1(earthmax - d.earth_Canada))
+              .attr("height", x1(1))
+              .style("fill", '#51637A');
+          })           
+     .on("mouseout", function(d) {   
           tooldiv.transition()    
-              .duration(500)    
-              .style("opacity", 0)
+              .duration(50)    
+              .style("opacity", 0) 
+          earthdiv.transition()    
+              .duration(50)    
+              .style("opacity", 0) 
           g.selectAll("#earthHider").remove()
           g.selectAll("#earthtext").remove()
           g.selectAll("#earths")
               .style("opacity", 0);
-      });   
+           
+      });  
 
   // add the x axis
   g.append("g")
