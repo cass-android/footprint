@@ -158,18 +158,26 @@ function drawGraph(data) {
     return d.month;
   }));
 
-  var defs = g.append("image")
+ g.append("defs")
+      .append("pattern")
       .attr('id', 'earthfill')
-      .attr("xlink:href", "static/img.svg");
+      .attr('patternUnits', 'userSpaceOnUse')
+      .attr('width', 100)
+      .attr('height', 100)
+      .append("image")
+      .attr("xlink:href", "static/img.svg")
+      .attr('width', 100)
+      .attr('height', 100);
 
 
-  g.selectAll("bar")
+  g.selectAll("earths")
       .data(data)
-      .enter().append("rect")       // attach a rectangle
+      .enter().append("rect")
+      .attr('id', 'earths')       
       .attr("x", (width/3))        // position the left of the rectangle
       .attr("y", 0)         // position the top of the rectangle
       //.attr("clip-path", "url(#ellipse-clip)") // clip the rectangle
-      .style("fill", "white")   // fill the clipped path with grey
+      .style("fill", "url(#earthfill)")   // fill the clipped path with grey
       .attr("height", 100)    // set the height
       .attr("width", function (d) {return x1(d.earth_World); })    // set the width
 
@@ -190,6 +198,8 @@ function drawGraph(data) {
               .style("left", (d3.event.pageX) + "px")   
               .style("top", (d3.event.pageY) + "px")  
 
+          g.selectAll("#earths")
+              .style("opacity", 1)
           g.selectAll('earthdiv')
               .data(data, function (d) {return x1(Number(d.earth_World)); })
               .enter().append("rect")
@@ -205,7 +215,9 @@ function drawGraph(data) {
           tooldiv.transition()    
               .duration(500)    
               .style("opacity", 0) 
-          g.selectAll("#myBar").remove();
+          g.selectAll("#myBar").remove()
+          g.selectAll("#earths")
+              .style("opacity", 0);
            
       });
 
@@ -232,6 +244,7 @@ function drawGraph(data) {
           tooldiv.transition()    
               .duration(500)    
               .style("opacity", 0); 
+
       });   
 
   // add the x axis
