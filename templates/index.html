@@ -181,7 +181,11 @@ function drawGraph(data) {
       .attr("height", 100)    // set the height
       .attr("width", function (d) {return x1(d.earth_World); })    // set the width
 
-    // add the bars - World
+  var earthwidth = d3.max(graphData, function (d) {
+      return Number(d.earth_World);
+    })
+
+  // add the bars - World
   g.selectAll(".bar1")
       .data(data)
       .enter().append("rect")
@@ -208,7 +212,7 @@ function drawGraph(data) {
               .attr("id", "myBar")
               .attr("x", (width/3))
               .attr("y", 0)
-              .attr("width", x1(d.earth_World))
+              .attr("width", x1(earthwidth - d.earth_World))
               .attr("height", 100);
           })          
       .on("mouseout", function(d) {   
