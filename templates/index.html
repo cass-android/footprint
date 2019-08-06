@@ -147,7 +147,7 @@ function drawGraph(data) {
 
   // define the range
   x1.domain([0, d3.max(graphData, function (d) {
-    return Number(d.earth_World);
+    return Number(d.earth_Canada);
   })]); 
 
   y0.domain([0, d3.max(graphData, function (d) {
@@ -159,7 +159,7 @@ function drawGraph(data) {
   }));
 
   var earthwidth = d3.max(graphData, function (d) {
-    return Number(d.earth_World);
+    return Number(d.earth_Canada);
   })
 
   console.log(earthwidth)
@@ -233,7 +233,7 @@ function drawGraph(data) {
       });
 
   // add the bars - Canada
-  g.selectAll(".bar3")
+  g.selectAll(".bar2")
       .data(data)
       .enter().append("rect")
       .attr("class", "bar2")
@@ -249,13 +249,36 @@ function drawGraph(data) {
               .style("opacity", .9);   
           tooldiv.html(d.year + "<br/>"  + "Canada's Overshoot: "  + "<br/>"  + d.odate_can)
               .style("left", (d3.event.pageX) + "px")   
-              .style("top", (d3.event.pageY) + "px");  
+              .style("top", (d3.event.pageY) + "px")
+          g.append("text")
+              .attr('id', 'earthtext')
+              .attr("x", width * (2/3) )
+              .attr("y", 50)
+              .attr("text-anchor", "left")
+              .attr("font-family", "Arial, Helvetica, sans-serif")
+              .style("font-size", "16px")
+              .style("fill", '#E5E6DA')
+              .text("Number of Earths Required:" + d.earth_Canada)
+          g.selectAll("#earths")
+              .style("opacity", 1)
+          g.selectAll('earthdiv')
+              .data(data, function (d) {return x1(Number(d.earth_Canada)); })
+              .enter().append("rect")
+              .attr("id", "earthHider")
+              .attr("x", (width/3))
+              .attr("y", 0)
+              .attr("width", x1(earthwidth -d.earth_Canada))
+              .attr("height", 100)
+              .style("fill", '#51637A'); 
           })            
       .on("mouseout", function(d) {   
           tooldiv.transition()    
               .duration(500)    
-              .style("opacity", 0); 
-
+              .style("opacity", 0)
+          g.selectAll("#earthHider").remove()
+          g.selectAll("#earthtext").remove()
+          g.selectAll("#earths")
+              .style("opacity", 0);
       });   
 
   // add the x axis
