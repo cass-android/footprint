@@ -1,0 +1,70 @@
+ .bar1 {
+      fill: #E5E6DA;
+      opacity: 0.9;
+    }
+
+    .bar1:hover {
+      fill: #F3B63D;
+      opacity: 1;
+    }
+
+    .bar2 {
+      fill: #4F7D60;
+      opacity: 0.7;
+    }
+
+    .bar2:hover {
+      fill: #1D6538;
+      opacity: 1;
+    }
+
+    .line {
+      fill: none;
+      stroke: #96ADCB;
+      stroke-width: 1px;
+      stroke-dasharray: 5,5; 
+    }
+
+    .axisWhite line{
+      stroke: #96ADCB;
+      stroke-width: 1px;
+
+    }
+
+    .axisWhite path{
+      stroke: #96ADCB;
+    }
+
+    .axisWhite text{
+      fill: #96ADCB;
+      font-size: 13px;
+    }
+    div.tooltip { 
+      position: absolute;     
+      text-align: center;     
+      width: 130px;          
+      height: 44px;         
+      padding: 2px;       
+      font: 12px sans-serif;    
+      background: lightsteelblue; 
+      border: 0px;    
+      border-radius: 8px;     
+      pointer-events: none;     
+  }
+    div.earthtextbox { 
+      position: absolute;     
+      text-align: right;
+      top: 105px;
+      left: 550px;     
+      width: 120px;          
+      height: 44px;         
+      padding: 2px;       
+      font: 18px sans-serif;
+      color: #E5E6DA;
+      border: 0px;
+      border-radius: 8px;
+      pointer-events: none;
+  }
+    body {
+      background: #51637A; 
+      }
