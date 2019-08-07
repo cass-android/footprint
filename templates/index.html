@@ -11,7 +11,6 @@
 
 <script>
 
-
 //-------------------------------------- Set up the canvas ----------------------------------------------
 // set the dimensions
 var svg = d3.select("svg");
@@ -34,7 +33,7 @@ var tooldiv = d3.select("body").append("div")
   .style("opacity", 0);
 
 // define the div for the earth display (normally invisible)
-var earthdiv = d3.select("body").append("div")
+var earthtext = d3.select("body").append("div")
   .attr("class", "earthtextbox")
   .style("opacity", 0);
 
@@ -103,7 +102,7 @@ function drawGraph(data) {
     .append("pattern")
     .attr('id', 'earthfill')
     .attr('patternUnits', 'userSpaceOnUse')
-    .attr('x', (width/2))                       // Starting position (top left corner)
+    .attr('x', (width/2)-50)                       // Starting position (top left corner)
     .attr('y', 0)
     .attr('width', x1(1))                       // Width and height set using scaleLinear
     .attr('height', x1(1))                      
@@ -114,7 +113,7 @@ function drawGraph(data) {
 
   g.append("rect")
     .attr('id', 'earths')       
-    .attr("x", (width/2))   
+    .attr("x", (width/2)-50)   
     .attr("y", 0)         
     .style("fill", "url(#earthfill)")   
     .attr("height", x1(1))    
@@ -148,15 +147,16 @@ function drawGraph(data) {
             .style("left", (d3.event.pageX) + "px")   
             .style("top", (d3.event.pageY) + "px")
           }
-        earthdiv.transition()      // Transition in the text at the top of the chart    
+        earthtext.transition()      // Transition in the text at the top of the chart    
           .duration(50)    
           .style("opacity", 1);  
-        earthdiv.html("Number of Earths Required:" + "<br/>" + round(d.earth_World))
+        earthtext.html("Number of Earths Needed" + "<br/>" + 
+          "To Sustain Us At This Level:" + "<br/>" + round(d.earth_World))
         g.selectAll("#earths")      // Show earths image bar (does this need to be selectAll??)
           .style("opacity", 1)
         g.append("rect")
           .attr("id", "earthHider")
-          .attr("x", (width/2) + x1(d.earth_World))
+          .attr("x", (width/2)-50 + x1(d.earth_World))
           .attr("y", 0)
           .attr("width", x1(earthmax - d.earth_World))
           .attr("height", x1(1))
@@ -166,7 +166,7 @@ function drawGraph(data) {
         tooldiv.transition()    
           .duration(50)    
           .style("opacity", 0) 
-        earthdiv.transition()    
+        earthtext.transition()    
           .duration(50)    
           .style("opacity", 0) 
         g.selectAll("#earthHider").remove()
@@ -193,15 +193,16 @@ function drawGraph(data) {
         tooldiv.html(d.year + "<br/>"  + "Canada Overshoot Day: "  + "<br/>"  + d.odate_can)
           .style("left", (d3.event.pageX) + "px")   
           .style("top", (d3.event.pageY) + "px")
-        earthdiv.transition()    // Transition in the text at the top of the chart
+        earthtext.transition()    // Transition in the text at the top of the chart
           .duration(50)    
           .style("opacity", 1);  
-        earthdiv.html("Number of Earths Required:" + "<br/>" + round(d.earth_Canada))
+        earthtext.html("Number of Earths Needed" + "<br/>" + 
+          "To Sustain Us At This Level:" + "<br/>" + round(d.earth_Canada))
         g.selectAll("#earths")    // Show earths image bar (does this need to be selectAll??)
           .style("opacity", 1)
         g.append("rect")
           .attr("id", "earthHider")
-          .attr("x", (width/2) + x1(d.earth_Canada))
+          .attr("x", (width/2)-50 + x1(d.earth_Canada))
           .attr("y", 0)
           .attr("width", x1(earthmax - d.earth_Canada))
           .attr("height", x1(1))
@@ -211,7 +212,7 @@ function drawGraph(data) {
         tooldiv.transition()    
           .duration(50)    
           .style("opacity", 0) 
-        earthdiv.transition()    
+        earthtext.transition()    
           .duration(50)    
           .style("opacity", 0) 
         g.selectAll("#earthHider").remove()
@@ -266,7 +267,7 @@ function drawGraph(data) {
     .style("text-anchor", "middle")
     .style("font-size", "20px")
     .style("fill", '#96ADCB')
-    .text("Month When We Reach Earth's Limits")
+    .text("Month When We Fall Into Ecological Debt")
 
   // ADD OTHER ELEMENTS
 
