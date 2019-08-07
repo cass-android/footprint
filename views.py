@@ -9,8 +9,8 @@ import pandas as pd
 import json
 
 
-@app.route('/', methods=['GET'])
-def index():
+@app.route('/overshootdays', methods=['GET'])
+def overshootdays():
 
     months = ['Jan','Feb','Mar','Apr','May','Jun',
      'Jul','Aug','Sep','Oct','Nov','Dec', ' Jan', ' Feb', ' Mar', ' Apr', ' May', ' Jun']
@@ -26,4 +26,4 @@ def index():
 
     data = {'chart_data':chart_data, 'ylabel_data':ylabel_data }
 
-    return render_template('index.html', data=data)
+    return render_template('overshootdays.html', data=data)
