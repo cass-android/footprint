@@ -8,6 +8,9 @@ from app import app
 import pandas as pd
 import json
 
+@app.route('/', methods=['GET'])
+def hello():
+	return 'you\'re at the main page'
 
 @app.route('/overshootdays', methods=['GET'])
 def overshootdays():
