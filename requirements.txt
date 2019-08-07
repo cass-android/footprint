@@ -8,6 +8,7 @@ decorator==4.4.0
 defusedxml==0.6.0
 entrypoints==0.3
 Flask==1.1.1
+gunicorn==19.9.0
 ipykernel==5.1.1
 ipython==7.7.0
 ipython-genutils==0.2.0
@@ -21,8 +22,8 @@ MarkupSafe==1.1.1
 mistune==0.8.4
 # mkl-fft==1.0.12
 # mkl-random==1.0.2
-nb-conda==2.2.1
-nb-conda-kernels==2.2.2
+# nb-conda==2.2.1
+# nb-conda-kernels==2.2.2
 nbconvert==5.5.0
 nbformat==4.4.0
 notebook==6.0.0
