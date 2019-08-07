@@ -83,6 +83,7 @@
 </div>
 
 <script>
+
 // set the dimensions for the canvas
 var svg = d3.select("svg"),
 margin = {
@@ -98,33 +99,37 @@ height = +svg.attr("height") - margin.top - margin.bottom,
 g = svg.append("g").attr("transform", 
   "translate(" + margin.left + "," + margin.top + ")");
 
-// these variables scale data relative to the svg canvas 
-var x = d3.scaleBand()
-  .range([0, width])  
-  .paddingInner(0.1);
-
-var x1 = d3.scaleLinear()  // for earth display
-  .rangeRound([0,width/3])
-
-var y0 = d3.scaleLinear()
-  .rangeRound([height, 0]);
-
-var y1 = d3.scalePoint()
-  .range([height, 0]);
-
-// import data from views.py (in JSON)
-var graphData = {{ data.chart_data | safe }}
-var ylabelData = {{ data.ylabel_data | safe }}
-
 // define the div for the tooltip (normally invisible)
 var tooldiv = d3.select("body").append("div") 
-    .attr("class", "tooltip")       
-    .style("opacity", 0);
+  .attr("class", "tooltip")       
+  .style("opacity", 0);
 
 // define the div for the earth display 
 var earthdiv = d3.select("body").append("div")
-    .attr("class", "earthtextbox")
-    .style("opacity", 0);
+  .attr("class", "earthtextbox")
+  .style("opacity", 0);
+
+//-------------------------------------- Import Data ----------------------------------------------
+
+var graphData = {{ data.chart_data | safe }}
+var ylabelData = {{ data.ylabel_data | safe }}
+
+//-------------------------------------- Define variables ------------------------------------------
+
+// SCALE THE DATA
+var x = d3.scaleBand()       // Main chart:  x-axis
+  .range([0, width])  
+  .paddingInner(0.1);
+
+var x1 = d3.scaleLinear()    // Earth display
+  .rangeRound([0,width/3])
+
+var y0 = d3.scaleLinear()    // Main chart:  numerical y-axis (values)
+  .rangeRound([height, 0]);
+
+var y1 = d3.scalePoint()     // Main chart: categorical y-axis (dates)
+  .range([height, 0]);
+
 
 // create a date formatter (used in tooltip)
 var formatter = d3.timeFormat("%B %d");
@@ -135,32 +140,32 @@ graphData.forEach(function(d) {
     d.odate_can = formatter(new Date(d.odate_can))
 });
 
-// draw the graph
-function drawGraph(data) {
-  console.log(data)
-  // define the ranges for the axes
-  x.domain(graphData.map(function (d) {
-      return d.year;
-    }));
-
-  // define the range
-  x1.domain([0, d3.max(graphData, function (d) {
-    return Number(d.earth_Canada);
-  })]); 
-
-  y0.domain([0, d3.max(graphData, function (d) {
-      return Number(d.od_world) + 17;
-    })]); 
-
-  y1.domain(ylabelData.map(function (d) {
-    return d.month;
+// define the ranges for the axes
+x.domain(graphData.map(function (d) {
+    return d.year;
   }));
 
-  var earthmax = d3.max(graphData, function (d) {
-    return Number(d.earth_Canada);
-  })
+// define the range
+x1.domain([0, d3.max(graphData, function (d) {
+  return Number(d.earth_Canada);
+})]); 
 
-  var round = d3.format(".3n")
+y0.domain([0, d3.max(graphData, function (d) {
+    return Number(d.od_world) + 17;
+  })]); 
+
+y1.domain(ylabelData.map(function (d) {
+  return d.month;
+}));
+
+var earthmax = d3.max(graphData, function (d) {
+  return Number(d.earth_Canada);
+})
+
+var round = d3.format(".3n")
+
+//-------------------------------------- Draw the Graph ------------------------------------------
+function drawGraph(data) {
 
  // ADD THE ROW OF EARTH IMAGES (NORMALLY HIDDEN)
 
@@ -178,183 +183,191 @@ function drawGraph(data) {
     .attr('height', x1(1));
 
   g.append("rect")
-      .attr('id', 'earths')       
-      .attr("x", (width/2))   
-      .attr("y", 0)         
-      .style("fill", "url(#earthfill)")   
-      .attr("height", x1(1))    
-      .attr("width", x1(earthmax))
-      .style("opacity", 0);    
+    .attr('id', 'earths')       
+    .attr("x", (width/2))   
+    .attr("y", 0)         
+    .style("fill", "url(#earthfill)")   
+    .attr("height", x1(1))    
+    .attr("width", x1(earthmax))
+    .style("opacity", 0);    
 
   // ADD THE 'WORLD' BARS
+  // To do: make this into a separate function
+
   g.selectAll(".bar1")
-      .data(data)                               // Join new data with old elements, if any
-      .enter().append("rect")                   // Create the new elements
-      .attr("class", "bar1")
-      .attr("x", function (d) {return x(d.year); })
-      .attr("y", function (d) { return y0(Number(d.od_world)); })
-      .attr("width", x.bandwidth())
-      .attr("height", function (d) {return height - y0(Number(d.od_world)); })
-      .on("mouseover", function(d) {    
-          tooldiv.transition()       // For the tooltip    
-              .duration(50)          // Note: Transition is a state change; can't create new elements    
-              .style("opacity", .9)
-              .attr("id", "tooldiv")      
-            if (d.oyear === 1900) {   // Use different text in tooltip depending on field value
-            tooldiv
-                .html(d.year + "<br/>"  + "World Overshoot Day: "  + "<br/>"  + d.odate_world)
-                .style("left", (d3.event.pageX) + "px")   
-                .style("top", (d3.event.pageY) + "px")
-            } else {
-            tooldiv
-                .html(d.year + "<br/>"  + "No World Overshoot Day")
-                .style("left", (d3.event.pageX) + "px")   
-                .style("top", (d3.event.pageY) + "px")
-            }
-          earthdiv.transition()      // Transition in the text at the top of the chart    
-              .duration(50)    
-              .style("opacity", 1);  
-          earthdiv.html("Number of Earths Required:" + "<br/>" + round(d.earth_World))
-          g.selectAll("#earths")
-              .style("opacity", 1)
-          g.append("rect")
-              .attr("id", "earthHider")
-              .attr("x", (1/2*width) + x1(d.earth_World))
-              .attr("y", 0)
-              .attr("width", x1(earthmax - d.earth_World))
-              .attr("height", x1(1))
-              .style("fill", '#51637A');
-          })          
-      .on("mouseout", function(d) {   
-          tooldiv.transition()    
-              .duration(50)    
-              .style("opacity", 0) 
-          earthdiv.transition()    
-              .duration(50)    
-              .style("opacity", 0) 
-          g.selectAll("#earthHider").remove()
-          g.selectAll("#earthtext").remove()
-          g.selectAll("#earths")
-              .style("opacity", 0);
-           
-      });
+    .data(data)                               // Join new data with old elements, if any
+    .enter().append("rect")                   // Create the new elements
+    .attr("class", "bar1")
+    .attr("x", function (d) {return x(d.year); })
+    .attr("y", function (d) { return y0(Number(d.od_world)); })
+    .attr("width", x.bandwidth())
+    .attr("height", function (d) {return height - y0(Number(d.od_world)); })
+    .on("mouseover", function(d) {    
+        tooldiv.transition()       // For the tooltip    
+          .duration(50)          // Note: Transition is a state change; can't create new elements    
+          .style("opacity", .9)
+          .attr("id", "tooldiv")      
+          if (d.oyear === 1900) {   // Use different text in tooltip depending on field value
+          tooldiv
+            .html(d.year + "<br/>"  + "World Overshoot Day: "  + "<br/>"  + d.odate_world)
+            .style("left", (d3.event.pageX) + "px")   
+            .style("top", (d3.event.pageY) + "px")
+          } else {
+          tooldiv
+            .html(d.year + "<br/>"  + "No World Overshoot Day")
+            .style("left", (d3.event.pageX) + "px")   
+            .style("top", (d3.event.pageY) + "px")
+          }
+        earthdiv.transition()      // Transition in the text at the top of the chart    
+          .duration(50)    
+          .style("opacity", 1);  
+        earthdiv.html("Number of Earths Required:" + "<br/>" + round(d.earth_World))
+        g.selectAll("#earths")      // Show earths image bar (does this need to be selectAll??)
+          .style("opacity", 1)
+        g.append("rect")
+          .attr("id", "earthHider")
+          .attr("x", (width/2) + x1(d.earth_World))
+          .attr("y", 0)
+          .attr("width", x1(earthmax - d.earth_World))
+          .attr("height", x1(1))
+          .style("fill", '#51637A');
+        })          
+    .on("mouseout", function(d) {   
+        tooldiv.transition()    
+          .duration(50)    
+          .style("opacity", 0) 
+        earthdiv.transition()    
+          .duration(50)    
+          .style("opacity", 0) 
+        g.selectAll("#earthHider").remove()
+        g.selectAll("#earthtext").remove()
+        g.selectAll("#earths")
+          .style("opacity", 0);
+         
+    });
 
-  // add the bars - Canada
+  // ADD THE 'CANADA' BARS
+
   g.selectAll(".bar2")
-      .data(data)
-      .enter().append("rect")
-      .attr("class", "bar2")
-      .attr("x", function (d) {return x(d.year); })
-      .attr("y", function (d) {return y0(Number(d.od_can_pc)); })
-      .attr("width", x.bandwidth())
-      .attr("height", function (d) {return height - y0(Number(d.od_can_pc)); })
-      .on("mouseover", function(d) {    
-          tooldiv.transition()    
-              .duration(50)    
-              .style("opacity", .9);   
-          tooldiv.html(d.year + "<br/>"  + "Canada Overshoot Day: "  + "<br/>"  + d.odate_can)
-              .style("left", (d3.event.pageX) + "px")   
-              .style("top", (d3.event.pageY) + "px")
-          earthdiv.transition()    
-              .duration(50)    
-              .style("opacity", 1);  
-          earthdiv.html("Number of Earths Required:" + "<br/>" + round(d.earth_Canada))
-          g.selectAll("#earths")
-              .style("opacity", 1)
-          g.append("rect")
-              .attr("id", "earthHider")
-              .attr("x", (1/2*width) + x1(d.earth_Canada))
-              .attr("y", 0)
-              .attr("width", x1(earthmax - d.earth_Canada))
-              .attr("height", x1(1))
-              .style("fill", '#51637A');
-          })           
-     .on("mouseout", function(d) {   
-          tooldiv.transition()    
-              .duration(50)    
-              .style("opacity", 0) 
-          earthdiv.transition()    
-              .duration(50)    
-              .style("opacity", 0) 
-          g.selectAll("#earthHider").remove()
-          g.selectAll("#earthtext").remove()
-          g.selectAll("#earths")
-              .style("opacity", 0);
-           
-      });  
+    .data(data)
+    .enter().append("rect")
+    .attr("class", "bar2")
+    .attr("x", function (d) {return x(d.year); })
+    .attr("y", function (d) {return y0(Number(d.od_can_pc)); })
+    .attr("width", x.bandwidth())
+    .attr("height", function (d) {return height - y0(Number(d.od_can_pc)); })
+    .on("mouseover", function(d) {    
+        tooldiv.transition()    // For the tooltip
+          .duration(50)    
+          .style("opacity", .9);   
+        tooldiv.html(d.year + "<br/>"  + "Canada Overshoot Day: "  + "<br/>"  + d.odate_can)
+          .style("left", (d3.event.pageX) + "px")   
+          .style("top", (d3.event.pageY) + "px")
+        earthdiv.transition()    // Transition in the text at the top of the chart
+          .duration(50)    
+          .style("opacity", 1);  
+        earthdiv.html("Number of Earths Required:" + "<br/>" + round(d.earth_Canada))
+        g.selectAll("#earths")    // Show earths image bar (does this need to be selectAll??)
+          .style("opacity", 1)
+        g.append("rect")
+          .attr("id", "earthHider")
+          .attr("x", (width/2) + x1(d.earth_Canada))
+          .attr("y", 0)
+          .attr("width", x1(earthmax - d.earth_Canada))
+          .attr("height", x1(1))
+          .style("fill", '#51637A');
+        })           
+   .on("mouseout", function(d) {   
+        tooldiv.transition()    
+          .duration(50)    
+          .style("opacity", 0) 
+        earthdiv.transition()    
+          .duration(50)    
+          .style("opacity", 0) 
+        g.selectAll("#earthHider").remove()
+        g.selectAll("#earthtext").remove()
+        g.selectAll("#earths")
+          .style("opacity", 0);
+         
+    });  
 
-  // add the x axis
+  // ADD THE AXES
+
+  // x axis
   g.append("g")
-      .attr("class", "axisWhite")
-      .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x))
-    .selectAll("text")
-      .attr("y", 0)
-      .attr("x", 8)
-      .attr("dy", ".35em")
-      .attr("transform", "rotate(90)")
-      .style("text-anchor", "start")
+    .attr("class", "axisWhite")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(x))
+  .selectAll("text")
+    .attr("y", 0)
+    .attr("x", 8)
+    .attr("dy", ".35em")
+    .attr("transform", "rotate(90)")
+    .style("text-anchor", "start")
 
-    var ticks = d3.selectAll(".tick text");
-      ticks.attr("class", function(d,i){
-          if(i%3 != 0) d3.select(this).remove();
-      });
+  var ticks = d3.selectAll(".tick text");
+    ticks.attr("class", function(d,i){
+        if(i%3 != 0) d3.select(this).remove();
+    });
 
-  // add the y axis
+  // y axis
   g.append("g")
-      .attr("class", "axisWhite")
-      .call(d3.axisLeft(y1))
+    .attr("class", "axisWhite")
+    .call(d3.axisLeft(y1))
 
-  // add the chart title
+  // ADD THE TITLES
+
+  // chart
   g.append("text")
-      .attr("fill", "#E5E6DA")
-      .attr("x", (width / 2))
-      .attr("y", 2 - (margin.top / 2))
-      .attr("text-anchor", "middle")
-      .attr("font-family", "Arial, Helvetica, sans-serif")
-      .style("font-size", "30px")
-      .text("Overshoot Days: Canada and the World")
+    .attr("fill", "#E5E6DA")
+    .attr("x", (width / 2))
+    .attr("y", 2 - (margin.top / 2))
+    .attr("text-anchor", "middle")
+    .attr("font-family", "Arial, Helvetica, sans-serif")
+    .style("font-size", "30px")
+    .text("Overshoot Days: Canada and the World")
 
-  // add the y axis title
+  // y axis
   g.append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 20  - margin.left)
-      .attr("x", 0 - (height / 2))
-      .attr("dy", "0.8em")
-      .attr("font-family", "Arial, Helvetica, sans-serif")
-      .style("text-anchor", "middle")
-      .style("font-size", "20px")
-      .style("fill", '#96ADCB')
-      .text("Month When We Reach Earth's Limits")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 20  - margin.left)
+    .attr("x", 0 - (height / 2))
+    .attr("dy", "0.8em")
+    .attr("font-family", "Arial, Helvetica, sans-serif")
+    .style("text-anchor", "middle")
+    .style("font-size", "20px")
+    .style("fill", '#96ADCB')
+    .text("Month When We Reach Earth's Limits")
 
-  // add the fill area
+  // OTHER ELEMENTS
+
+  // fill area
   g.append("g")
-      .append("rect")
-      .attr('x', 0)
-      .attr('y', 0)
-      .attr('width', 200)
-      .attr('height', y0(365))
-      .style("fill", '#51637A' )
-      .style("opacity", .7 )
+    .append("rect")
+    .attr('x', 0)
+    .attr('y', 0)
+    .attr('width', 200)
+    .attr('height', y0(365))
+    .style("fill", '#51637A' )
+    .style("opacity", .7 )
 
-  // add the horizontal line
+  // horizontal line
   g.append("g")
-      .attr("class", "line")
-      .append("line")
-      .attr("x1", 0)
-      .attr("x2", width)
-      .attr("y1", y0(365))
-      .attr("y2", y0(365))
+    .attr("class", "line")
+    .append("line")
+    .attr("x1", 0)
+    .attr("x2", width)
+    .attr("y1", y0(365))
+    .attr("y2", y0(365))
 
+  // text on horizontal line
   g.append("text")
-      .attr("x", 10)
-      .attr("y", y0(375))
-      .text("No Overshoot Above This Line")
-      .attr("fill", "#E5E6DA")
-      .attr("font-family", "Arial, Helvetica, sans-serif")
-
-
-      };
+    .attr("x", 10)
+    .attr("y", y0(375))
+    .text("No Overshoot Above This Line")
+    .attr("fill", "#E5E6DA")
+    .attr("font-family", "Arial, Helvetica, sans-serif")
+    };
 
 drawGraph(graphData);
 
