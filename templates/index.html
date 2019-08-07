@@ -162,18 +162,20 @@ function drawGraph(data) {
 
   var round = d3.format(".3n")
 
- g.append("defs")
-      .append("pattern")
-      .attr('id', 'earthfill')
-      .attr('patternUnits', 'userSpaceOnUse')
-      .attr('x', (width/2))
-      .attr('y', 0)
-      .attr('width', x1(1))
-      .attr('height', x1(1))
-      .append("image")
-      .attr("xlink:href", "static/img.svg")
-      .attr('width', x1(1))
-      .attr('height', x1(1));
+ // ADD THE ROW OF EARTH IMAGES (NORMALLY HIDDEN)
+
+  g.append("defs")                                 // Create the fill pattern definition
+    .append("pattern")
+    .attr('id', 'earthfill')
+    .attr('patternUnits', 'userSpaceOnUse')
+    .attr('x', (width/2))                       // Starting position (top left corner)
+    .attr('y', 0)
+    .attr('width', x1(1))                       // Width and height set using scaleLinear
+    .attr('height', x1(1))                      
+    .append("image")
+    .attr("xlink:href", "static/img.svg")
+    .attr('width', x1(1))                       // Image same size as pattern element
+    .attr('height', x1(1));
 
   g.append("rect")
       .attr('id', 'earths')       
@@ -184,21 +186,21 @@ function drawGraph(data) {
       .attr("width", x1(earthmax))
       .style("opacity", 0);    
 
-  // add the bars - World
+  // ADD THE 'WORLD' BARS
   g.selectAll(".bar1")
-      .data(data)
-      .enter().append("rect")
+      .data(data)                               // Join new data with old elements, if any
+      .enter().append("rect")                   // Create the new elements
       .attr("class", "bar1")
       .attr("x", function (d) {return x(d.year); })
       .attr("y", function (d) { return y0(Number(d.od_world)); })
       .attr("width", x.bandwidth())
       .attr("height", function (d) {return height - y0(Number(d.od_world)); })
       .on("mouseover", function(d) {    
-          tooldiv.transition()    
-              .duration(50)    
+          tooldiv.transition()       // For the tooltip    
+              .duration(50)          // Note: Transition is a state change; can't create new elements    
               .style("opacity", .9)
               .attr("id", "tooldiv")      
-            if (d.oyear === 1900) {
+            if (d.oyear === 1900) {   // Use different text in tooltip depending on field value
             tooldiv
                 .html(d.year + "<br/>"  + "World Overshoot Day: "  + "<br/>"  + d.odate_world)
                 .style("left", (d3.event.pageX) + "px")   
@@ -209,15 +211,13 @@ function drawGraph(data) {
                 .style("left", (d3.event.pageX) + "px")   
                 .style("top", (d3.event.pageY) + "px")
             }
-          earthdiv.transition()    
+          earthdiv.transition()      // Transition in the text at the top of the chart    
               .duration(50)    
               .style("opacity", 1);  
           earthdiv.html("Number of Earths Required:" + "<br/>" + round(d.earth_World))
           g.selectAll("#earths")
               .style("opacity", 1)
-          g.selectAll('earthdiv')
-              .data(data, function (d) {return x1(Number(d.earth_World)); })
-              .enter().append("rect")
+          g.append("rect")
               .attr("id", "earthHider")
               .attr("x", (1/2*width) + x1(d.earth_World))
               .attr("y", 0)
@@ -244,9 +244,7 @@ function drawGraph(data) {
       .data(data)
       .enter().append("rect")
       .attr("class", "bar2")
-      .attr("x", function (d) {
-        return x(d.year);
-      })
+      .attr("x", function (d) {return x(d.year); })
       .attr("y", function (d) {return y0(Number(d.od_can_pc)); })
       .attr("width", x.bandwidth())
       .attr("height", function (d) {return height - y0(Number(d.od_can_pc)); })
@@ -263,9 +261,7 @@ function drawGraph(data) {
           earthdiv.html("Number of Earths Required:" + "<br/>" + round(d.earth_Canada))
           g.selectAll("#earths")
               .style("opacity", 1)
-          g.selectAll('earthdiv')
-              .data(data, function (d) {return x1(Number(d.earth_Canada)); })
-              .enter().append("rect")
+          g.append("rect")
               .attr("id", "earthHider")
               .attr("x", (1/2*width) + x1(d.earth_Canada))
               .attr("y", 0)
